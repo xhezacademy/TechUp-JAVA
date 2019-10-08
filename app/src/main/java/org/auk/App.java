@@ -8,8 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /**
- * Hello world!
- *
+ * TechUp JAVA - SAMS
  */
 public class App 
 {

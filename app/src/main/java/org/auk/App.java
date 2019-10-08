@@ -20,16 +20,9 @@ public class App
     {
         StudentRepository repository = new StudentRepository(5);
 
-        // Table Banner
-        String banner =
-                "=".repeat(X_TIMES) + System.getProperty("line.separator") +
-                "|                       Hello JAVA Gurus!                       |\n" +
-                "=".repeat(X_TIMES);
-        print(banner);
-
-        // Table Columns
-        print("| ID " + " ".repeat(5) + "| NAME " + " ".repeat(10) + "| DoB " + " ".repeat(13) + "| TEL " + " ".repeat(12) + "|");
-        print("-".repeat(X_TIMES));
+        // Table Headers
+        printTableBanner();
+        printTableColumns();
 
         for (Student student : repository.getAll()) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d MMM, Y", Locale.getDefault());
@@ -48,7 +41,7 @@ public class App
           Get Student by id
          */
         Student theStudent = repository.getById(2);
-        Objects.requireNonNull(theStudent);
+//        Objects.requireNonNull(theStudent);
 
         /*
           Add student to the list
@@ -58,7 +51,20 @@ public class App
         s.setFirstName("Xhevat");
         s.setLastName("Xhezairi");
         s.setGender(Student.Gender.MALE);
-        repository.add(s);
+//        repository.add(s);
+    }
+
+    private static void printTableColumns() {
+        print("| ID " + " ".repeat(5) + "| NAME " + " ".repeat(10) + "| DoB " + " ".repeat(13) + "| TEL " + " ".repeat(12) + "|");
+        print("-".repeat(X_TIMES));
+    }
+
+    private static void printTableBanner() {
+        String banner =
+                "=".repeat(X_TIMES) + System.getProperty("line.separator") +
+                "|                       Hello JAVA Gurus!                       |\n" +
+                "=".repeat(X_TIMES);
+        print(banner);
     }
 
     /**

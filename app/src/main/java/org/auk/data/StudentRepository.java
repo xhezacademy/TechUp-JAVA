@@ -10,7 +10,8 @@ public class StudentRepository implements DataSourceInterface<Student> {
     private List<Student> studentList;
 
     public StudentRepository(int numberOfStudents) {
-        studentList = Faker.buildMockStudents(numberOfStudents);
+//        studentList = Faker.buildMockStudentsFromCollection(numberOfStudents);
+        studentList = Faker.buildMockStudentsFromFile(numberOfStudents);
     }
 
     @Override

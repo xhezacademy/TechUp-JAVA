@@ -2,16 +2,18 @@ package org.auk.utils;
 
 import org.auk.models.Student;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Faker {
+
+    private final static String DB_FILE_NAME = "database.txt";
 
     public static List<Student> buildMockStudentsFromCollection(int studentCount) {
         List<Student> students = new ArrayList<>(studentCount);
@@ -60,20 +62,12 @@ public class Faker {
 
     /**
      * Reads input stream from an existing text file
-     * TODO: implement FileSystem DataSource
-     * @param numberOfStudents
      */
-    public static List<Student> buildMockStudentsFromFile(int numberOfStudents) {
-//        for (Map.Entry<?,?> e : System.getProperties().entrySet()) {
-//            System.out.println(String.format("%s = %s", e.getKey(), e.getValue()));
-//        }
-
+    public static List<Student> buildMockStudentsFromFile() {
         List<Student> studentList = new ArrayList<>();
 
-//        System.lineSeparator()
-        String fileName = System.getProperty("user.dir") + File.separator + "db/database.txt";
-
-        final File file = new File(fileName);
+        final String dbFileName = System.getProperty("user.dir") + File.separator + "db" + File.separator + DB_FILE_NAME;
+        final File file = new File(dbFileName);
 
         try (final FileInputStream fileInputStream = new FileInputStream(file)) {
             if (!file.exists()) {
@@ -97,7 +91,7 @@ public class Faker {
 //            }
 
             // Read line by line
-//            BufferedReader reader = new BufferedReader(new FileReader(fileName, StandardCharsets.UTF_8));
+//            BufferedReader reader = new BufferedReader(new FileReader(dbFileName, StandardCharsets.UTF_8));
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
 
 //            var sb = new StringBuilder();
@@ -107,9 +101,9 @@ public class Faker {
 //            }
 //            System.out.println(sb.toString());
 
-            // JAVA 8 File reading API
-//            String content = Files.readString(Path.of(fileName));
-            List<String> lines = Files.readAllLines(Path.of(fileName));
+            // JAVA 8 File API
+//            String content = Files.readString(Path.of(dbFileName));
+            List<String> lines = Files.readAllLines(Path.of(dbFileName));
 
             for (var line : lines) {
                 String[] values = line.split("\\s*,\\s*");

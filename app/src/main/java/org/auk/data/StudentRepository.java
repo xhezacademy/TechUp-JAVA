@@ -11,7 +11,7 @@ public class StudentRepository implements DataSourceInterface<Student> {
 
     public StudentRepository(int numberOfStudents) {
 //        studentList = Faker.buildMockStudentsFromCollection(numberOfStudents);
-        studentList = Faker.buildMockStudentsFromFile(numberOfStudents);
+        studentList = Faker.buildMockStudentsFromFile();
     }
 
     @Override

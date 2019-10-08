@@ -74,14 +74,11 @@ public class Faker {
         String fileName = System.getProperty("user.dir") + File.separator + "db/database.txt";
 
         final File file = new File(fileName);
-        final FileInputStream fileInputStream;
 
-        try {
+        try (final FileInputStream fileInputStream = new FileInputStream(file)) {
             if (!file.exists()) {
                 file.createNewFile();
             }
-
-//            fileInputStream = new FileInputStream(file);
 
             // Read char decimal value
 //            int i;
@@ -133,6 +130,11 @@ public class Faker {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
+//        finally {
+//            if (fileInputStream != null) {
+//                fileInputStream.close();
+//            }
+//        }
 
         return studentList;
     }

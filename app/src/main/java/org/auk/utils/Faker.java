@@ -50,6 +50,7 @@ public class Faker {
 
             Calendar dateOfBirth = Calendar.getInstance();
             dateOfBirth.add(Calendar.DAY_OF_MONTH, -((18 * 365) + random.nextInt(60 * 365)));
+            System.out.println(dateOfBirth.getTime());
             student.setDob(dateOfBirth.getTime());
 
             students.add(student);
@@ -61,6 +62,7 @@ public class Faker {
     /**
      * Reads input stream from an existing text file
      * TODO: implement FileSystem DataSource
+     *
      * @param numberOfStudents
      */
     public static List<Student> buildMockStudentsFromFile(int numberOfStudents) {
@@ -136,6 +138,63 @@ public class Faker {
 //            }
 //        }
 
+        return studentList;
+    }
+
+    public static List<Student> buildMockStudentsFromScanner() {
+        Scanner sc = new Scanner(System.in);
+        List<Student> studentList = new ArrayList<>();
+        String end = "end";
+        System.out.println();
+        String name = "";
+        String lastName = "";
+        String birthday = "";
+        String phone = "";
+        int input = 0;
+        boolean terminate = false;
+        int id = 0;
+        while (terminate == false) {
+            System.out.println();
+        System.out.println("============== Regjistro Student ==============");
+            System.out.print("Name : ");
+            name = sc.nextLine();
+            System.out.print("LastName : ");
+            lastName = sc.nextLine();
+            System.out.print("Birthday : ");
+            birthday = sc.nextLine();
+            System.out.print("Phone : ");
+            phone = sc.nextLine();
+
+            Student student = new Student();
+            student.setFirstName(name);
+            student.setLastName(lastName);
+            SimpleDateFormat simpleDateFormat =
+                    new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date dob = null;
+            try {
+                dob = simpleDateFormat.parse(birthday);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            student.setId(id++);
+            student.setDob(dob);
+            student.setPhone(phone);
+            studentList.add(student);
+            System.out.println();
+
+            System.out.print("Type : 1 for (New Student) , 2 for (Terminate) : ");
+
+            input = sc.nextInt();
+
+            while (input != 1 && input != 2){
+                System.out.print("Type : 1 for (New Student) , 2 for (Terminate) : ");
+                input = sc.nextInt();
+            }
+
+            terminate = input == 2 ? true :false;
+           sc.nextLine();
+
+        }
         return studentList;
     }
 }

@@ -31,6 +31,7 @@ public class App
                     + "| {2}" + " ".repeat(16 - (simpleDateFormat.format(student.getDob()).length() - 1))
                     + "| {3}" + " ".repeat(15 - (student.getPhone().length() - 1))
                     + "|";
+//            System.out.println(output);
             MessageFormat mf = new MessageFormat(output);
             print(mf.format(new Object[] {student.getId(), student.getFirstName(),
                     simpleDateFormat.format(student.getDob()), student.getPhone()}));

@@ -2,16 +2,18 @@ package org.auk.utils;
 
 import org.auk.models.Student;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Faker {
+
+    private final static String DB_FILE_NAME = "database.txt";
 
     public static List<Student> buildMockStudentsFromCollection(int studentCount) {
         List<Student> students = new ArrayList<>(studentCount);
@@ -61,21 +63,16 @@ public class Faker {
 
     /**
      * Reads input stream from an existing text file
+     * <<<<<<< HEAD
      * TODO: implement FileSystem DataSource
      *
-     * @param numberOfStudents
+     * @param ======= >>>>>>> refs/remotes/origin/master
      */
-    public static List<Student> buildMockStudentsFromFile(int numberOfStudents) {
-//        for (Map.Entry<?,?> e : System.getProperties().entrySet()) {
-//            System.out.println(String.format("%s = %s", e.getKey(), e.getValue()));
-//        }
-
+    public static List<Student> buildMockStudentsFromFile() {
         List<Student> studentList = new ArrayList<>();
 
-//        System.lineSeparator()
-        String fileName = System.getProperty("user.dir") + File.separator + "db/database.txt";
-
-        final File file = new File(fileName);
+        final String dbFileName = System.getProperty("user.dir") + File.separator + "db" + File.separator + DB_FILE_NAME;
+        final File file = new File(dbFileName);
 
         try (final FileInputStream fileInputStream = new FileInputStream(file)) {
             if (!file.exists()) {
@@ -99,7 +96,7 @@ public class Faker {
 //            }
 
             // Read line by line
-//            BufferedReader reader = new BufferedReader(new FileReader(fileName, StandardCharsets.UTF_8));
+//            BufferedReader reader = new BufferedReader(new FileReader(dbFileName, StandardCharsets.UTF_8));
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
 
 //            var sb = new StringBuilder();
@@ -109,9 +106,9 @@ public class Faker {
 //            }
 //            System.out.println(sb.toString());
 
-            // JAVA 8 File reading API
-//            String content = Files.readString(Path.of(fileName));
-            List<String> lines = Files.readAllLines(Path.of(fileName));
+            // JAVA 8 File API
+//            String content = Files.readString(Path.of(dbFileName));
+            List<String> lines = Files.readAllLines(Path.of(dbFileName));
 
             for (var line : lines) {
                 String[] values = line.split("\\s*,\\s*");
@@ -142,6 +139,8 @@ public class Faker {
     }
 
     public static List<Student> buildMockStudentsFromScanner() {
+
+
         Scanner sc = new Scanner(System.in);
         List<Student> studentList = new ArrayList<>();
         String end = "end";
@@ -155,7 +154,7 @@ public class Faker {
         int id = 0;
         while (terminate == false) {
             System.out.println();
-        System.out.println("============== Regjistro Student ==============");
+            System.out.println("============== Regjistro Student ==============");
             System.out.print("Name : ");
             name = sc.nextLine();
             System.out.print("LastName : ");
@@ -176,7 +175,8 @@ public class Faker {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            student.setId(id++);
+            int lastId = getLastId();
+            student.setId(lastId+1);
             student.setDob(dob);
             student.setPhone(phone);
             studentList.add(student);
@@ -186,15 +186,70 @@ public class Faker {
 
             input = sc.nextInt();
 
-            while (input != 1 && input != 2){
+            while (input != 1 && input != 2) {
                 System.out.print("Type : 1 for (New Student) , 2 for (Terminate) : ");
                 input = sc.nextInt();
             }
 
-            terminate = input == 2 ? true :false;
-           sc.nextLine();
+            terminate = input == 2 ? true : false;
+            sc.nextLine();
 
         }
+        final String dbFileName = System.getProperty("user.dir") + File.separator + "db" + File.separator + DB_FILE_NAME;
+        final File file = new File(dbFileName);
+        if(!file.exists()){
+            System.out.println("File not exist");
+        }
+
+        PrintWriter printWriter = null;
+        try {
+            printWriter = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+            if(printWriter != null){
+                System.out.println("========exists");
+            }
+
+            for (Student s : studentList) {
+                printWriter.println(s.getId() + ", " + s.getFirstName() + ", " + s.getLastName() + ", " + s.getDob() + ", " + s.getPhone());
+            }
+            printWriter.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
         return studentList;
     }
+
+    public static int getLastId(){
+        final String dbFileName = System.getProperty("user.dir") + File.separator + "db" + File.separator + DB_FILE_NAME;
+        final File file = new File(dbFileName);
+        if(!file.exists()){
+            System.out.println("File not exist");
+        }
+        int lastId = 0;
+        try {
+            String line = "";
+
+            String [] values ;
+            int id ;
+            BufferedReader bufferedReader  = new BufferedReader(new FileReader(file));
+
+
+            while ((line = bufferedReader.readLine())!= null){
+
+                 values= line.split(",");
+                 id = Integer.parseInt(values[0]);
+                 lastId = Math.max(id,lastId);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lastId;
+    }
+
 }

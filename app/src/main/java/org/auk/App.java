@@ -6,25 +6,30 @@ import org.auk.models.Student;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.Objects;
 
 /**
- * Hello world!
- *
+ * TechUp JAVA - SAMS
  */
 public class App 
 {
     private static int X_TIMES = 65;
 
+    private static StudentRepository repository;
+
     public static void main( String[] args )
     {
-        StudentRepository repository = new StudentRepository(5);
+        print("Welcome to Student Management System 2020");
+
+        repository = new StudentRepository(5);
 
         // Table Headers
         printTableBanner();
         printTableColumns();
+        printTableBody();
+    }
 
-        for (Student student : repository.getAll()) {
+    private static void printTableBody() {
+        for (Student student : repository.getAllFromFile()) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d MMM, Y", Locale.getDefault());
             String output = "| {0} " + " ".repeat(7 - (String.valueOf(student.getId()).length()))
                     + "| {1} " + " ".repeat(13 - (student.getFirstName().length() - 1))

@@ -29,13 +29,14 @@ public class App
     }
 
     private static void printTableBody() {
-        for (Student student : repository.getAll()) {
+        for (Student student : repository.getAllFromFile()) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d MMM, Y", Locale.getDefault());
             String output = "| {0} " + " ".repeat(7 - (String.valueOf(student.getId()).length()))
                     + "| {1} " + " ".repeat(13 - (student.getFirstName().length() - 1))
                     + "| {2}" + " ".repeat(16 - (simpleDateFormat.format(student.getDob()).length() - 1))
                     + "| {3}" + " ".repeat(15 - (student.getPhone().length() - 1))
                     + "|";
+//            System.out.println(output);
             MessageFormat mf = new MessageFormat(output);
             print(mf.format(new Object[] {student.getId(), student.getFirstName(),
                     simpleDateFormat.format(student.getDob()), student.getPhone()}));

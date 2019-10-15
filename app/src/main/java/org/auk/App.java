@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.Scanner;
 
 /**
- * TechUp JAVA - SAMS
+ * TechUp JAVA 2019
  */
 public class App 
 {

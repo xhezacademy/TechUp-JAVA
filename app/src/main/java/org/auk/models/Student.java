@@ -94,4 +94,8 @@ public class Student {
         this.dob = dob;
     }
 
+    @Override
+    public String toString() {
+        return Student.class + "\n [ID]: " + id + " [Name]: " + firstName;
+    }
 }

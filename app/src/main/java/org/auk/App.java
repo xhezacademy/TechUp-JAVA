@@ -2,10 +2,15 @@ package org.auk;
 
 import org.auk.data.StudentRepository;
 import org.auk.models.Student;
+import org.auk.utils.ConsoleColors;
+import org.auk.utils.Faker;
 
 import java.text.MessageFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Scanner;
 
 /**
  * TechUp JAVA - SAMS
@@ -18,14 +23,70 @@ public class App
 
     public static void main( String[] args )
     {
-        print("Welcome to Student Management System 2020");
+        print(ConsoleColors.PURPLE_BACKGROUND_BRIGHT + ConsoleColors.BLACK_BOLD + " ~ Welcome to Student Management System 2020 ~ " + ConsoleColors.RESET);
+        print(ConsoleColors.YELLOW_BACKGROUND_BRIGHT + ConsoleColors.BLUE_UNDERLINED + "Please fill in the data for the new student..." + ConsoleColors.RESET);
+        print("=".repeat(50));
 
         repository = new StudentRepository(5);
+
+        boolean receiving = true;
+
+        for (;receiving;) {
+            String studentData = readNewStudentDataFromInput();
+            repository.add(repository.getNextRecordId() + ", " + studentData, true);
+            repository.refreshList();
+
+            print("Do you want to create another student record? Y/n:");
+            Scanner sc = new Scanner(System.in);
+            char answer = sc.next().charAt(0);
+
+            switch (answer) {
+                case 'N', 'n' -> receiving = false;
+            }
+        }
+
+        print(ConsoleColors.RED_BOLD + "Thank you for your service, and see you soon again! ^_^" + ConsoleColors.RESET);
 
         // Table Headers
         printTableBanner();
         printTableColumns();
         printTableBody();
+    }
+
+    private static String readNewStudentDataFromInput() {
+        String[] columns = {"Name", "Surname", "Birthday", "Phone", "Email"};
+
+        // Create a Scanner instance and initialize with
+        // predefined standard input object
+        Scanner sc = new Scanner(System.in);
+        StringBuilder sb = new StringBuilder();
+
+        // Initialize count of input elements
+        int count = 0;
+
+        // Check if an int value is available
+        while (count < columns.length)
+        {
+            print(ConsoleColors.BLUE_BACKGROUND_BRIGHT + ConsoleColors.WHITE_BOLD_BRIGHT + columns[count] + ":" + ConsoleColors.RESET);
+            sb.append(sc.nextLine()).append(", ");
+            count++;
+        }
+
+//        String[] newData = sb.toString().split(",");
+//        Student newStudent = new Student();
+//        newStudent.setFirstName(newData[0]);
+//        newStudent.setLastName(newData[1]);
+//        newStudent.setEmail(newData[3]);
+//        newStudent.setPhone(newData[4]);
+
+//        try {
+//            Date dob = new SimpleDateFormat("dd/MM/yyyy").parse(newData[2]);
+//            newStudent.setDob(dob);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+
+        return sb.toString();
     }
 
     private static void printTableBody() {

@@ -2,11 +2,11 @@ package org.auk.utils;
 
 import org.auk.models.Student;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -15,6 +15,11 @@ public class Faker {
 
     private final static String DB_FILE_NAME = "database.txt";
 
+    /**
+     * Generate a List of Students with random data
+     * @param studentCount Total number of Collection elements
+     * @return List<Student>
+     */
     public static List<Student> buildMockStudentsFromCollection(int studentCount) {
         List<Student> students = new ArrayList<>(studentCount);
 
@@ -61,7 +66,7 @@ public class Faker {
     }
 
     /**
-     * Reads input stream from an existing text file
+     * Populate Student List from a FileSystem data source
      */
     public static List<Student> buildMockStudentsFromFile() {
         List<Student> studentList = new ArrayList<>();

@@ -96,6 +96,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return Student.class + "\n [ID]: " + id + " [Name]: " + firstName;
+        String gen = getGender() == 1 ? "Male" : "Female" ;
+        return id + " : " + firstName + " " + " " + lastName + ", " + " " +  gen  + " , +383" + phone;
     }
 }

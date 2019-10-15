@@ -1,10 +1,9 @@
 package org.auk.utils;
 
 import org.auk.models.Student;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
@@ -13,13 +12,13 @@ import java.util.*;
 
 public class Faker {
 
-    private final static String DB_FILE_NAME = "database.txt";
+    private String path ;
 
-    /**
-     * Generate a List of Students with random data
-     * @param studentCount Total number of Collection elements
-     * @return List<Student>
-     */
+    public Faker(String path) {
+        this.path = path ;
+    }
+
+
     public static List<Student> buildMockStudentsFromCollection(int studentCount) {
         List<Student> students = new ArrayList<>(studentCount);
 
@@ -66,13 +65,21 @@ public class Faker {
     }
 
     /**
-     * Populate Student List from a FileSystem data source
+     * Reads input stream from an existing text file
+     * TODO: implement FileSystem DataSource
+     * @param numberOfStudents
      */
-    public static List<Student> buildMockStudentsFromFile() {
+    public static List<Student> buildMockStudentsFromFile(int numberOfStudents) {
+//        for (Map.Entry<?,?> e : System.getProperties().entrySet()) {
+//            System.out.println(String.format("%s = %s", e.getKey(), e.getValue()));
+//        }
+
         List<Student> studentList = new ArrayList<>();
 
-        final String dbFileName = System.getProperty("user.dir") + File.separator + "db" + File.separator + DB_FILE_NAME;
-        final File file = new File(dbFileName);
+//        System.lineSeparator()
+        String fileName = System.getProperty("user.dir") + File.separator + "db/database.txt";
+
+        final File file = new File(fileName);
 
         try (final FileInputStream fileInputStream = new FileInputStream(file)) {
             if (!file.exists()) {
@@ -96,7 +103,7 @@ public class Faker {
 //            }
 
             // Read line by line
-//            BufferedReader reader = new BufferedReader(new FileReader(dbFileName, StandardCharsets.UTF_8));
+//            BufferedReader reader = new BufferedReader(new FileReader(fileName, StandardCharsets.UTF_8));
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
 
 //            var sb = new StringBuilder();
@@ -106,11 +113,13 @@ public class Faker {
 //            }
 //            System.out.println(sb.toString());
 
-            // JAVA 8 File API
-//            String content = Files.readString(Path.of(dbFileName));
-            List<String> lines = Files.readAllLines(Path.of(dbFileName));
+            // JAVA 8 File reading API
+//            String content = Files.readString(Path.of(fileName));
+            List<String> lines = Files.readAllLines(Path.of(fileName));
 
             for (var line : lines) {
+
+
                 String[] values = line.split("\\s*,\\s*");
 
                 Student student = new Student();
@@ -136,5 +145,29 @@ public class Faker {
 //        }
 
         return studentList;
+    }
+
+    public void writeStudentsInFiles(Student s) {
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(path, true))) {
+            bw.write(s.toString() + "\n");
+            System.out.println();
+            System.out.println("Student : " + s + " added succesfully !");
+            System.out.println();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String findLastLine() {
+        String last = "" ;
+        try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String lineReader = "" ;
+            while ((lineReader = br.readLine()) != null) {
+                last = lineReader ;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return last ;
     }
 }

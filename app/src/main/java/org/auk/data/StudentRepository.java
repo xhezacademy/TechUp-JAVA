@@ -1,6 +1,7 @@
 package org.auk.data;
 
 import org.auk.models.Student;
+import org.auk.utils.Faker;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,16 +13,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static org.auk.utils.Faker.buildMockStudentsFromFile;
+
 public class StudentRepository implements DataSourceInterface<Student> {
 
     private int nextRecordId;
     private FileDataSourceImpl dataSource;
     private List<Student> studentList;
 
-    public StudentRepository(int numberOfStudents) {
+    public StudentRepository(int numberOfStudents) throws IOException {
 //        studentList = Faker.buildMockStudentsFromCollection(numberOfStudents);
-//        studentList = Faker.buildMockStudentsFromFile();
         dataSource = new FileDataSourceImpl();
+        studentList = buildMockStudentsFromFile();
         initializeStudentList();
     }
 

@@ -16,8 +16,31 @@ public class FileDataSourceImpl {
 
     private final String dbFileName;
 
-    FileDataSourceImpl() {
+    FileDataSourceImpl() throws IOException  {
+        File theDir = new File("db");
+
+// if the directory does not exist, create it
+        if (!theDir.exists()) {
+            System.out.println("creating directory: " + theDir.getName());
+            boolean result = false;
+
+            try{
+                theDir.mkdir();
+                result = true;
+            }
+            catch(SecurityException se){
+                //handle it
+            }
+            if(result) {
+                System.out.println("DIR created");
+            }
+        }
         dbFileName = System.getProperty("user.dir") + File.separator + "db" + File.separator + DB_FILE_NAME;
+        final File file = new File(dbFileName);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
     }
 
     String getDbFileName() {

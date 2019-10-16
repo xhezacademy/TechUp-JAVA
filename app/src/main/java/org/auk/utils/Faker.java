@@ -75,9 +75,7 @@ public class Faker {
         final File file = new File(dbFileName);
 
         try (final FileInputStream fileInputStream = new FileInputStream(file)) {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
+
 
             // Read char decimal value
 //            int i;

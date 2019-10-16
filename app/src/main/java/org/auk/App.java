@@ -5,6 +5,7 @@ import org.auk.models.Student;
 import org.auk.utils.ConsoleColors;
 import org.auk.utils.Faker;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,8 +22,7 @@ public class App
 
     private static StudentRepository repository;
 
-    public static void main( String[] args )
-    {
+    public static void main( String[] args ) throws IOException {
         print(ConsoleColors.PURPLE_BACKGROUND_BRIGHT + ConsoleColors.BLACK_BOLD + " ~ Welcome to Student Management System 2020 ~ " + ConsoleColors.RESET);
         print(ConsoleColors.YELLOW_BACKGROUND_BRIGHT + ConsoleColors.BLUE_UNDERLINED + "Please fill in the data for the new student..." + ConsoleColors.RESET);
         print("=".repeat(50));
@@ -41,7 +41,12 @@ public class App
             char answer = sc.next().charAt(0);
 
             switch (answer) {
-                case 'N', 'n' -> receiving = false;
+                case 'N':
+                    receiving=false ;
+                    break;
+                case'n' :
+                    receiving=false;
+                    break;
             }
         }
 

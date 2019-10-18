@@ -14,7 +14,6 @@ import java.util.Locale;
 
 public class StudentRepository implements DataSourceInterface<Student> {
 
-    private int nextRecordId;
     private FileDataSourceImpl dataSource;
     private List<Student> studentList;
 
@@ -22,38 +21,15 @@ public class StudentRepository implements DataSourceInterface<Student> {
 //        studentList = Faker.buildMockStudentsFromCollection(numberOfStudents);
 //        studentList = Faker.buildMockStudentsFromFile();
         dataSource = new FileDataSourceImpl();
-        initializeStudentList();
+        studentList = dataSource.readAll();
     }
 
-    private void initializeStudentList() {
-        studentList = new ArrayList<>();
-
-        try {
-            List<String> lines = Files.readAllLines(Path.of(dataSource.getDbFileName()));
-
-            for (var line : lines) {
-                String[] values = line.split("\\s*,\\s*");
-
-                Student student = new Student();
-                student.setId(Integer.parseInt(values[0]));
-                student.setFirstName(values[1].trim());
-                student.setLastName(values[2].trim());
-                student.setPhone(values[4]);
-
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                Date dob = simpleDateFormat.parse(values[3]);
-                student.setDob(dob);
-
-                nextRecordId = Integer.parseInt(values[0]) + 1;
-                studentList.add(student);
-            }
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+    public void refreshList() {
+        studentList = dataSource.readAll();
     }
 
     public int getNextRecordId() {
-        return nextRecordId;
+        return dataSource.getNextRecordId();
     }
 
     @Override
@@ -85,9 +61,5 @@ public class StudentRepository implements DataSourceInterface<Student> {
     public void add(String studentData, boolean appendToFile) {
         dataSource.write(studentData, appendToFile);
         refreshList();
-    }
-
-    public void refreshList() {
-        initializeStudentList();
     }
 }

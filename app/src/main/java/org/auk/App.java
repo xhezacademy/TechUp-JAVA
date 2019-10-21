@@ -1,21 +1,25 @@
 package org.auk;
 
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import org.auk.data.StudentRepository;
 import org.auk.models.Student;
 import org.auk.utils.ConsoleColors;
-import org.auk.utils.Faker;
 
 import java.text.MessageFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Scanner;
 
 /**
  * TechUp JAVA 2019
+ *
+ * Extra JavaFX GUI components http://www.jfoenix.com
  */
-public class App 
+public class App extends Application
 {
     private static int X_TIMES = 65;
 
@@ -23,6 +27,20 @@ public class App
 
     public static void main( String[] args )
     {
+        launch(args);
+        //launchCLI(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/layout_main.fxml"));
+        Scene scene = new Scene(root, 300, 275);
+        primaryStage.setTitle("Hello TechUp!");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private static void launchCLI(String... args) {
         print(ConsoleColors.PURPLE_BACKGROUND_BRIGHT + ConsoleColors.BLACK_BOLD + " ~ Welcome to Student Management System 2020 ~ " + ConsoleColors.RESET);
         print(ConsoleColors.YELLOW_BACKGROUND_BRIGHT + ConsoleColors.BLUE_UNDERLINED + "Please fill in the data for the new student..." + ConsoleColors.RESET);
         print("=".repeat(50));

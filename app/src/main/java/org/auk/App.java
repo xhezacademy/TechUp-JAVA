@@ -9,12 +9,16 @@ import org.auk.data.StudentRepository;
 import org.auk.models.Student;
 import org.auk.utils.ConsoleColors;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * TechUp JAVA 2019
@@ -34,29 +38,38 @@ public class App extends Application
         //launch(args);
         //launchCLI(args);
 
-//            Properties dbProperties = new Properties();
-//            dbProperties.put("username", "root");
-//            dbProperties.put("password", "root");
-
-        try (var connection = DriverManager.getConnection(DB_URL, "root", "root");
+        try (var connection = getConnection();
              var stmt = connection.createStatement();
              var results = stmt.executeQuery("SELECT * FROM students")) {
 
-            // Load Database Driver
-            Class.forName("org.mariadb.jdbc.Driver");
-//            DriverManager.registerDriver(new org.mariadb.jdbc.Driver());
-//            print(connection.getClass().getSimpleName());
-//            print(stmt.getClass().getSimpleName());
-
-            // Print returned results
-//            var results = stmt.executeQuery("SELECT 'Hello World'");;
             while (results.next()) {
-                print("ID: "+ results.getString(1)
-                    + "\nName: " + results.getString("firstName"));
+                var metaData = results.getMetaData();
+
+                for (var i = 1; i <= metaData.getColumnCount(); i++) {
+                    var column = metaData.getColumnName(i).substring(0, 1).toUpperCase() + metaData.getColumnName(i).substring(1);
+                    print(column + ": " + results.getString(i));
+                }
+
+                print(System.lineSeparator());
             }
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private static Connection getConnection() throws SQLException, ClassNotFoundException {
+        // Load Database Driver
+        Class.forName("org.mariadb.jdbc.Driver");
+        // DriverManager.registerDriver(new org.mariadb.jdbc.Driver());
+
+        Properties props = new Properties();
+        props.putAll(Stream.of(new String[][] {
+                { "user", "root" },
+                { "password", "root" },
+                { "autoReconnect", "true" }
+        }).collect(Collectors.toMap(entry -> entry[0], entry -> entry[1])));
+
+        return DriverManager.getConnection(DB_URL, props);
     }
 
     @Override

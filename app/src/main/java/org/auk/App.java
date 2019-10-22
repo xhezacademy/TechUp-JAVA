@@ -9,6 +9,8 @@ import org.auk.data.StudentRepository;
 import org.auk.models.Student;
 import org.auk.utils.ConsoleColors;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -21,14 +23,40 @@ import java.util.Scanner;
  */
 public class App extends Application
 {
+    private final static String DB_URL = "jdbc:mariadb://localhost/techupdb?useSSL=false";
+
     private static int X_TIMES = 65;
 
     private static StudentRepository repository;
 
     public static void main( String[] args )
     {
-        launch(args);
+        //launch(args);
         //launchCLI(args);
+
+//            Properties dbProperties = new Properties();
+//            dbProperties.put("username", "root");
+//            dbProperties.put("password", "root");
+
+        try (var connection = DriverManager.getConnection(DB_URL, "root", "root");
+             var stmt = connection.createStatement();
+             var results = stmt.executeQuery("SELECT * FROM students")) {
+
+            // Load Database Driver
+            Class.forName("org.mariadb.jdbc.Driver");
+//            DriverManager.registerDriver(new org.mariadb.jdbc.Driver());
+//            print(connection.getClass().getSimpleName());
+//            print(stmt.getClass().getSimpleName());
+
+            // Print returned results
+//            var results = stmt.executeQuery("SELECT 'Hello World'");;
+            while (results.next()) {
+                print("ID: "+ results.getString(1)
+                    + "\nName: " + results.getString("firstName"));
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

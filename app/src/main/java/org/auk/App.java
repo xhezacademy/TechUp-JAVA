@@ -15,21 +15,20 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * TechUp JAVA 2019
  *
- * Extra JavaFX GUI components http://www.jfoenix.com
+ * @link Extra JavaFX GUI components http://www.jfoenix.com
  */
-public class App extends Application
-{
+public class App extends Application {
     private final static String DB_URL = "jdbc:mariadb://localhost/techupdb?useSSL=false";
     private final static int X_TIMES = 65;
-
-    private static StudentRepository repository;
 
     /*
      * The Hidden Synchronized Keyword With a Static Block
@@ -37,14 +36,27 @@ public class App extends Application
      */
     private static final String currentTimeString;
     private static String lastUsedTimeString;
+
     static {
         currentTimeString = LocalDate.now().toString();
     }
 
-    public static void main( String[] args )
-    {
-        try (var connection = getConnection();
-             var stmt = connection.createStatement();
+    private static StudentRepository repository;
+    private static Connection connection;
+
+    public static void main(String[] args) {
+        try (var ignore = getConnection()) {
+            getStudentList();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //launch(args);
+        //launchCLI(args);
+    }
+
+    private static void getStudentList() {
+        try (var stmt = connection.createStatement();
              var results = stmt.executeQuery("SELECT * FROM students")) {
 
             while (results.next()) {
@@ -57,37 +69,39 @@ public class App extends Application
 
                 print(System.lineSeparator());
             }
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        //launch(args);
-        //launchCLI(args);
     }
 
     /**
      * Initiates and returns the Connection instance of the specified Database driver
-     *
+     * <p>
      * Bonus: Find out more about Maps
+     *
      * @link https://www.baeldung.com/java-initialize-hashmap
      */
-    private static Connection getConnection() throws SQLException, ClassNotFoundException {
+    private static Connection getConnection() throws SQLException {
+        if (connection != null) {
+            return connection;
+        }
+
         // Class.forName("org.mariadb.jdbc.Driver");
         DriverManager.registerDriver(new org.mariadb.jdbc.Driver());
 
         Properties props = new Properties();
         // The Java 8 Way
-        props.putAll(Stream.of(new String[][] {
-                { "user", "root" },
-                { "password", "root" },
-                { "autoReconnect", "true" }
+        props.putAll(Stream.of(new String[][]{
+                {"user", "root"},
+                {"password", "root"},
+                {"autoReconnect", "true"}
         }).collect(Collectors.toMap(entry -> entry[0], entry -> entry[1])));
 
         // The Java 9 Way
 //        Map<String, String> propMap = Map.of("user","root", "password", "root", "autoReconnect", "true");
 //        props.putAll(propMap);
 
-        return DriverManager.getConnection(DB_URL, props);
+        return connection = DriverManager.getConnection(DB_URL, props);
     }
 
     @Override
@@ -142,8 +156,7 @@ public class App extends Application
         int count = 0;
 
         // Check if an int value is available
-        while (count < columns.length)
-        {
+        while (count < columns.length) {
             print(ConsoleColors.BLUE_BACKGROUND_BRIGHT + ConsoleColors.WHITE_BOLD_BRIGHT + columns[count] + ":" + ConsoleColors.RESET);
             sb.append(sc.nextLine()).append(", ");
             count++;
@@ -175,7 +188,7 @@ public class App extends Application
                     + "| {3}" + " ".repeat(15 - (student.getPhone().length() - 1))
                     + "|";
             MessageFormat mf = new MessageFormat(output);
-            print(mf.format(new Object[] {student.getId(), student.getFirstName(),
+            print(mf.format(new Object[]{student.getId(), student.getFirstName(),
                     simpleDateFormat.format(student.getDob()), student.getPhone()}));
             print("-".repeat(X_TIMES));
         }

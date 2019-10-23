@@ -14,9 +14,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,16 +27,22 @@ import java.util.stream.Stream;
 public class App extends Application
 {
     private final static String DB_URL = "jdbc:mariadb://localhost/techupdb?useSSL=false";
-
-    private static int X_TIMES = 65;
+    private final static int X_TIMES = 65;
 
     private static StudentRepository repository;
 
+    /*
+     * The Hidden Synchronized Keyword With a Static Block
+     * https://dzone.com/articles/the-hidden-synchronized-keyword-with-a-static-bloc
+     */
+    private static final String currentTimeString;
+    private static String lastUsedTimeString;
+    static {
+        currentTimeString = LocalDate.now().toString();
+    }
+
     public static void main( String[] args )
     {
-        //launch(args);
-        //launchCLI(args);
-
         try (var connection = getConnection();
              var stmt = connection.createStatement();
              var results = stmt.executeQuery("SELECT * FROM students")) {
@@ -55,19 +60,32 @@ public class App extends Application
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
+
+        //launch(args);
+        //launchCLI(args);
     }
 
+    /**
+     * Initiates and returns the Connection instance of the specified Database driver
+     *
+     * Bonus: Find out more about Maps
+     * @link https://www.baeldung.com/java-initialize-hashmap
+     */
     private static Connection getConnection() throws SQLException, ClassNotFoundException {
-        // Load Database Driver
-        Class.forName("org.mariadb.jdbc.Driver");
-        // DriverManager.registerDriver(new org.mariadb.jdbc.Driver());
+        // Class.forName("org.mariadb.jdbc.Driver");
+        DriverManager.registerDriver(new org.mariadb.jdbc.Driver());
 
         Properties props = new Properties();
+        // The Java 8 Way
         props.putAll(Stream.of(new String[][] {
                 { "user", "root" },
                 { "password", "root" },
                 { "autoReconnect", "true" }
         }).collect(Collectors.toMap(entry -> entry[0], entry -> entry[1])));
+
+        // The Java 9 Way
+//        Map<String, String> propMap = Map.of("user","root", "password", "root", "autoReconnect", "true");
+//        props.putAll(propMap);
 
         return DriverManager.getConnection(DB_URL, props);
     }
@@ -199,5 +217,9 @@ public class App extends Application
      */
     private static void print(String message) {
         System.out.println(message);
+    }
+
+    public static synchronized void updateLastUsedTime() {
+        lastUsedTimeString = LocalDate.now().toString();
     }
 }

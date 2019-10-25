@@ -8,18 +8,22 @@ import javafx.stage.Stage;
 import org.auk.data.StudentRepository;
 import org.auk.models.Student;
 import org.auk.utils.ConsoleColors;
+import org.auk.utils.DbUtil;
+import org.hibernate.SessionFactory;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.auk.utils.Logger.log;
 
 /**
  * TechUp JAVA 2019
@@ -44,12 +48,38 @@ public class App extends Application {
     private static StudentRepository repository;
     private static Connection connection;
 
+    @PersistenceContext
+    static EntityManager entityManager;
+
     public static void main(String[] args) {
-        try (var ignore = getConnection()) {
-            getStudentList();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        SessionFactory sessionFactory = DbUtil.getSessionFactory();
+        EntityManager em = sessionFactory.createEntityManager();
+        em.getTransaction().begin();
+        log().info("Transaction Begin");
+
+        Student student = new Student();
+        student.setFirstName("Idriz");
+        student.setLastName("Seferi");
+        student.setEmail("sefa@legends.com");
+        student.setBirthday(new Date());
+        em.persist(student);
+//        StudentDao studentDao = new StudentDao();
+//        studentDao.save(student);
+
+        List<Student> studentList = em.createQuery("from Student ", Student.class).getResultList();
+        for (Student std : studentList) {
+            print(std.getFullName());
         }
+
+        em.getTransaction().commit();
+        log().info("Transaction Commit");
+
+        // Pure JDBC - no ORM
+//        try (var ignore = getConnection()) {
+//            getStudentList();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
         //launch(args);
         //launchCLI(args);
@@ -122,7 +152,7 @@ public class App extends Application {
 
         boolean receiving = true;
 
-        for (;receiving;) {
+        for (; receiving; ) {
             String studentData = readNewStudentDataFromInput();
             repository.add(repository.getNextRecordId() + ", " + studentData, true);
             repository.refreshList();
@@ -184,12 +214,12 @@ public class App extends Application {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d MMM, Y", Locale.getDefault());
             String output = "| {0} " + " ".repeat(7 - (String.valueOf(student.getId()).length()))
                     + "| {1} " + " ".repeat(13 - (student.getFirstName().length() - 1))
-                    + "| {2}" + " ".repeat(16 - (simpleDateFormat.format(student.getDob()).length() - 1))
+                    + "| {2}" + " ".repeat(16 - (simpleDateFormat.format(student.getBirthday()).length() - 1))
                     + "| {3}" + " ".repeat(15 - (student.getPhone().length() - 1))
                     + "|";
             MessageFormat mf = new MessageFormat(output);
             print(mf.format(new Object[]{student.getId(), student.getFirstName(),
-                    simpleDateFormat.format(student.getDob()), student.getPhone()}));
+                    simpleDateFormat.format(student.getBirthday()), student.getPhone()}));
             print("-".repeat(X_TIMES));
         }
 
@@ -218,8 +248,8 @@ public class App extends Application {
     private static void printTableBanner() {
         String banner =
                 "=".repeat(X_TIMES) + System.getProperty("line.separator") +
-                "|                       Hello JAVA Gurus!                       |\n" +
-                "=".repeat(X_TIMES);
+                        "|                       Hello JAVA Gurus!                       |\n" +
+                        "=".repeat(X_TIMES);
         print(banner);
     }
 

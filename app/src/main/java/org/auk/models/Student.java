@@ -1,8 +1,25 @@
 package org.auk.models;
 
+import javax.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "students")
 public class Student {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(updatable = false, nullable = false)
+    private int id;
+    private String firstName;
+    private String lastName;
+    @Column(unique = true)
+    private String email;
+    @Column(name = "phone_number")
+    private String phone;
+    @Transient
+    private @Gender int gender;
+    private Date birthday;
 
     public Student() {
     }
@@ -13,7 +30,7 @@ public class Student {
         this.lastName = lastName;
         this.email = email;
         this.gender = gender;
-        this.dob = dob;
+        this.birthday = dob;
     }
 
     public String getFullName() {
@@ -29,14 +46,6 @@ public class Student {
         int MALE = 1;
         int FEMALE = 2;
     }
-
-    private int id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phone;
-    private @Gender int gender;
-    private Date dob;
 
     public int getId() {
         return id;
@@ -86,12 +95,12 @@ public class Student {
         this.gender = gender;
     }
 
-    public Date getDob() {
-        return dob;
+    public Date getBirthday() {
+        return birthday;
     }
 
-    public void setDob(Date dob) {
-        this.dob = dob;
+    public void setBirthday(Date dob) {
+        this.birthday = dob;
     }
 
     @Override

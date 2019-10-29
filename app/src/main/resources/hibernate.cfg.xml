@@ -16,6 +16,7 @@
 
         <!-- ORM mapping -->
         <mapping class="org.auk.models.Student" />
+        <mapping class="org.auk.models.StudentProfile" />
         <mapping class="org.auk.models.Course" />
 <!--        <mapping resource="student.hbm.xml" />-->
     </session-factory>

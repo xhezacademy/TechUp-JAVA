@@ -48,6 +48,21 @@
       <version>5.4.7.Final</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>6.0.7</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.10</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -103,6 +118,16 @@
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.flywaydb</groupId>
+          <artifactId>flyway-maven-plugin</artifactId>
+          <version>6.0.7</version>
+          <configuration>
+            <url>jdbc:mariadb://localhost/hibernatedb</url>
+            <user>root</user>
+            <password>root</password>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.auk.data.StudentRepository;
 import org.auk.models.Student;
+import org.auk.models.StudentProfile;
 import org.auk.utils.ConsoleColors;
 import org.auk.utils.DbUtil;
 import org.hibernate.SessionFactory;
@@ -15,6 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -29,8 +31,11 @@ import static org.auk.utils.Logger.log;
  * TechUp JAVA 2019
  *
  * @link Extra JavaFX GUI components http://www.jfoenix.com
+ * @link Lombok https://projectlombok.org/features/all
  */
-public class App extends Application {
+public class App
+//        extends Application
+{
     private final static String DB_URL = "jdbc:mariadb://localhost/techupdb?useSSL=false";
     private final static int X_TIMES = 65;
 
@@ -53,26 +58,25 @@ public class App extends Application {
 
     public static void main(String[] args) {
         SessionFactory sessionFactory = DbUtil.getSessionFactory();
-        EntityManager em = sessionFactory.createEntityManager();
-        em.getTransaction().begin();
+        entityManager = sessionFactory.createEntityManager();
+        entityManager.getTransaction().begin();
         log().info("Transaction Begin");
 
-        Student student = new Student();
-        student.setFirstName("Idriz");
-        student.setLastName("Seferi");
-        student.setEmail("sefa@legends.com");
-        student.setBirthday(new Date());
-        em.persist(student);
-//        StudentDao studentDao = new StudentDao();
-//        studentDao.save(student);
+        insertNewStudentRecord();
 
-        List<Student> studentList = em.createQuery("from Student ", Student.class).getResultList();
+        entityManager.getTransaction().commit();
+        log().info("Transaction Commit");
+
+        insertLatestStudentProfile();
+
+        // List all Students
+        List<Student> studentList = entityManager.createQuery("from Student ", Student.class).getResultList();
         for (Student std : studentList) {
             print(std.getFullName());
         }
 
-        em.getTransaction().commit();
-        log().info("Transaction Commit");
+        entityManager.getTransaction().commit();
+
 
         // Pure JDBC - no ORM
 //        try (var ignore = getConnection()) {
@@ -83,6 +87,31 @@ public class App extends Application {
 
         //launch(args);
         //launchCLI(args);
+    }
+
+    private static void insertNewStudentRecord() {
+        Student newStudent = new Student();
+        newStudent.setFirstName("Idriz");
+        newStudent.setLastName("Seferi");
+        newStudent.setEmail("sefa@legends.com");
+        entityManager.persist(newStudent);
+        log().info("New Student Inserted");
+//        StudentDao studentDao = new StudentDao();
+//        studentDao.save(student);
+    }
+
+    private static void insertLatestStudentProfile() {
+        log().info("Begin StudentProfile Creation");
+        entityManager.getTransaction().begin();
+        Student student = entityManager.find(Student.class, 1);
+        log().info("Student:" + student);
+        StudentProfile profile = new StudentProfile();
+        profile.setPhoneNumber("383440145");
+        profile.setAlternateEmail("email@chyrp.net");
+        profile.setBirthday(new Date());
+        profile.setStudent(student);
+        entityManager.persist(profile);
+        log().info("Student Profile Created");
     }
 
     private static void getStudentList() {
@@ -134,7 +163,7 @@ public class App extends Application {
         return connection = DriverManager.getConnection(DB_URL, props);
     }
 
-    @Override
+//    @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/layout_main.fxml"));
         Scene scene = new Scene(root, 300, 275);

@@ -5,6 +5,7 @@ import org.auk.utils.DbUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,23 @@ public class StudentDao implements BaseDao<Student> {
     @Override
     public void delete(Student student) {
 
+    }
+
+    public Student findById(int id) {
+        Student student = null;
+        Transaction transaction = null;
+
+        try (var session = DbUtil.getSessionFactory().getCurrentSession()) {
+            transaction = session.beginTransaction();
+            Query query = session.createQuery("from Student where id = (:id)");
+            query.setParameter("id", id);
+            student = (Student) query.getSingleResult();
+            transaction.commit();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+        }
+
+        return student;
     }
 
     public List<Student> getAll() {

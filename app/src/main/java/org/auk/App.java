@@ -1,6 +1,5 @@
 package org.auk;
 
-import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -8,35 +7,41 @@ import javafx.stage.Stage;
 import org.auk.data.StudentRepository;
 import org.auk.models.Student;
 import org.auk.models.StudentProfile;
+import org.auk.net.TechUpServer;
 import org.auk.utils.ConsoleColors;
 import org.auk.utils.DbUtil;
-import org.hibernate.SessionFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Scanner;
 
 import static org.auk.utils.Logger.log;
+import static org.auk.utils.Utils.print;
 
 /**
  * TechUp JAVA 2019
  *
  * @link Extra JavaFX GUI components http://www.jfoenix.com
  * @link Lombok https://projectlombok.org/features/all
+ *
+ * Web Servers
+ * @link https://www.eclipse.org/jetty/
+ * @link https://netty.io/
+ *
+ * Web Frameworks
+ * @link http://sparkjava.com/
+ * @link https://javalin.io/
  */
 public class App
 //        extends Application
 {
-    private final static String DB_URL = "jdbc:mariadb://localhost/techupdb?useSSL=false";
     private final static int X_TIMES = 65;
 
     /*
@@ -51,42 +56,47 @@ public class App
     }
 
     private static StudentRepository repository;
-    private static Connection connection;
 
     @PersistenceContext
     static EntityManager entityManager;
 
     public static void main(String[] args) {
-        SessionFactory sessionFactory = DbUtil.getSessionFactory();
-        entityManager = sessionFactory.createEntityManager();
-        entityManager.getTransaction().begin();
-        log().info("Transaction Begin");
-
-        insertNewStudentRecord();
-
-        entityManager.getTransaction().commit();
-        log().info("Transaction Commit");
-
-        insertLatestStudentProfile();
-
-        // List all Students
-        List<Student> studentList = entityManager.createQuery("from Student ", Student.class).getResultList();
-        for (Student std : studentList) {
-            print(std.getFullName());
+        try {
+            new TechUpServer(TechUpServer.ServerType.SPARK);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        entityManager.getTransaction().commit();
-
-
-        // Pure JDBC - no ORM
-//        try (var ignore = getConnection()) {
-//            getStudentList();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
+//        SessionFactory sessionFactory = DbUtil.getSessionFactory();
+//        entityManager = sessionFactory.createEntityManager();
+//        entityManager.getTransaction().begin();
+//        log().info("Transaction Begin");
+//
+//        insertNewStudentRecord();
+//
+//        entityManager.getTransaction().commit();
+//        log().info("Transaction Commit");
+//
+//        insertLatestStudentProfile();
+//
+//        // List all Students
+//        List<Student> studentList = entityManager.createQuery("from Student ", Student.class).getResultList();
+//        for (Student std : studentList) {
+//            print(std.getFullName());
 //        }
+//
+//        entityManager.getTransaction().commit();
 
         //launch(args);
         //launchCLI(args);
+    }
+
+    private static Student getStudentById(int studentId) {
+        entityManager.getTransaction().begin();
+        Student student = entityManager.find(Student.class, studentId);
+        entityManager.getTransaction().commit();
+
+        return student;
     }
 
     private static void insertNewStudentRecord() {
@@ -114,8 +124,9 @@ public class App
         log().info("Student Profile Created");
     }
 
+    // Pure JDBC - no ORM
     private static void getStudentList() {
-        try (var stmt = connection.createStatement();
+        try (var stmt = DbUtil.getConnection().createStatement();
              var results = stmt.executeQuery("SELECT * FROM students")) {
 
             while (results.next()) {
@@ -131,36 +142,6 @@ public class App
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Initiates and returns the Connection instance of the specified Database driver
-     * <p>
-     * Bonus: Find out more about Maps
-     *
-     * @link https://www.baeldung.com/java-initialize-hashmap
-     */
-    private static Connection getConnection() throws SQLException {
-        if (connection != null) {
-            return connection;
-        }
-
-        // Class.forName("org.mariadb.jdbc.Driver");
-        DriverManager.registerDriver(new org.mariadb.jdbc.Driver());
-
-        Properties props = new Properties();
-        // The Java 8 Way
-        props.putAll(Stream.of(new String[][]{
-                {"user", "root"},
-                {"password", "root"},
-                {"autoReconnect", "true"}
-        }).collect(Collectors.toMap(entry -> entry[0], entry -> entry[1])));
-
-        // The Java 9 Way
-//        Map<String, String> propMap = Map.of("user","root", "password", "root", "autoReconnect", "true");
-//        props.putAll(propMap);
-
-        return connection = DriverManager.getConnection(DB_URL, props);
     }
 
 //    @Override
@@ -280,15 +261,6 @@ public class App
                         "|                       Hello JAVA Gurus!                       |\n" +
                         "=".repeat(X_TIMES);
         print(banner);
-    }
-
-    /**
-     * Prints a message
-     *
-     * @param message Message to print
-     */
-    private static void print(String message) {
-        System.out.println(message);
     }
 
     public static synchronized void updateLastUsedTime() {

@@ -60,7 +60,7 @@ public class FileDataSourceImpl {
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date dob = simpleDateFormat.parse(values[3]);
-                student.setDob(dob);
+                student.setBirthday(dob);
 
                 nextRecordId = Integer.parseInt(values[0]) + 1;
                 studentList.add(student);

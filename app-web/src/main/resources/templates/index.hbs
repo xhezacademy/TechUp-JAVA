@@ -1,0 +1,16 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Blog with Spark Web Framework</title>
+</head>
+<body>
+    <p>Hello, <span th:text="${name}"></span></p>
+
+    <ul>
+        {{#each articles}}
+        <li><a href="/{{this.slug}}">{{this.title}}</a></li>
+        {{/each}}
+    </ul>
+</body>
+</html>

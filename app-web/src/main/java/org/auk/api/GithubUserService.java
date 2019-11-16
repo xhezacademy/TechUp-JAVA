@@ -14,7 +14,7 @@ public interface GithubUserService {
             "User-Agent: TechUp-Web-App"
     })
     @GET("users/{username}")
-    Call<User> getByUsername(@Path("username") String username);
+    Call<GithubUser> getByUsername(@Path("username") String username);
 
     @GET("user/repos")
     Call<JsonArray> getMyRepos(@Query("type") String type);

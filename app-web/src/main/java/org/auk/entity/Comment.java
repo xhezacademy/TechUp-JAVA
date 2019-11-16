@@ -14,11 +14,12 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     @ManyToOne
-    @JoinColumn(name = "article_id", nullable = false)
+    @JoinColumn(name = "article_id", referencedColumnName = "id", foreignKey=@ForeignKey(name = "FK_article_id"))
     Article article;
     String authorName;
     String authorEmail;
     String commendBody;
     Date createdAt;
+
 }
 

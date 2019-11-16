@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 @Data
-public class User {
+public class GithubUser {
 
     @SerializedName("login")
     @Expose

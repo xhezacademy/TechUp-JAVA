@@ -18,6 +18,7 @@
         <!-- ORM mapping -->
         <mapping class="org.auk.entity.Article"/>
         <mapping class="org.auk.entity.Comment"/>
+        <mapping class="org.auk.entity.User"/>
 <!--        <mapping resource="article.hbm.xml" />-->
     </session-factory>
 </hibernate-configuration>

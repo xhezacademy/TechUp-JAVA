@@ -21,7 +21,20 @@ public class Article {
     @OneToMany(mappedBy = "article")
     Set<Comment> comments;
     boolean published;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
     Date cratedAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
     Date updatedAt;
 
+    @PrePersist
+    protected void onCreate() {
+        updatedAt = cratedAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
 }

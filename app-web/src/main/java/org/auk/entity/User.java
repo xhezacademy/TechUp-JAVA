@@ -19,6 +19,12 @@ public class User {
     String email;
     String username;
     String password;
+    @Temporal(TemporalType.DATE)
     Date joinedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        joinedAt = new Date();
+    }
 
 }

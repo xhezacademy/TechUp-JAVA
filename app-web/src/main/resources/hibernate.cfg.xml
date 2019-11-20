@@ -8,7 +8,7 @@
         <property name="hibernate.connection.url">jdbc:mariadb://localhost:3306/simple-blog?useSSL=false</property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">root</property>
-        <property name="hibernate.connection.pool_size">100</property>
+        <property name="hibernate.connection.pool_size">1</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MariaDB103Dialect</property>

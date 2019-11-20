@@ -3,10 +3,13 @@ package org.auk;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.auk.api.GithubUser;
 import org.auk.api.GithubUserService;
 import org.auk.api.Repo;
 import org.auk.entity.ArticleDao;
+import org.auk.entity.User;
 import org.auk.entity.UserDao;
 import org.auk.net.ServiceGenerator;
 import org.auk.util.HashUtil;
@@ -16,6 +19,7 @@ import spark.template.handlebars.HandlebarsTemplateEngine;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +36,7 @@ public class App {
     public static void main(String[] args) {
         staticFiles.location("/public");
         port(8080);
+
         get("/", (req, res) -> {
             var model = Map.of("name", "Arian", "articles", new ArticleDao().getAll());
             return render(model, "index.hbs");
@@ -44,7 +49,6 @@ public class App {
             if (article.isPresent()) {
                 return render(Map.of("article", article.get()), "article.hbs");
             }
-
             return "Not found!";
         });
 
@@ -53,16 +57,10 @@ public class App {
 
         post("/login", (req, res) -> {
             Map<String, String> errors = new HashMap<>();
-            Map<String, String> fieldMap = new HashMap<>();
+            var fields = getPreparedFields(req.body());
 
-            String[] params = req.body().split("&");
-            for (String value : params) {
-                var field = value.split("=");
-                fieldMap.put(field[0], field[1]);
-            }
-
-            var username = fieldMap.get("username");
-            var password = fieldMap.get("password");
+            var username = fields.get("username");
+            var password = fields.get("password");
 
             if (username.isEmpty() || password.isEmpty()) {
                 errors.put("error", "Empty username and/or password!");
@@ -90,6 +88,28 @@ public class App {
         });
 
         post("/register", (req, res) -> {
+            List<NameValuePair> pairs = URLEncodedUtils.parse(req.body(), Charset.defaultCharset());
+            Map<String, String> params = toMap(pairs);
+
+            // Validate passwords match
+            if (!params.get("password").equals(params.get("confirm_password"))) {
+                res.header("Error", "Passwords do not match!");
+                res.redirect("/login");
+            }
+
+            // TODO: validate user with email not exists
+//            User existingUser = new UserDao().findByEmail();
+
+            User newUser = new User();
+            String[] fullName = params.get("fullName").split(" ");
+            newUser.setFirstName(fullName[0]);
+            newUser.setLastName(fullName[1]);
+            newUser.setEmail(params.get("email"));
+            newUser.setUsername(params.get("email").split("@")[0]);
+            newUser.setPassword(HashUtil.passwordHash(params.get("password")));
+
+            new UserDao().save(newUser);
+            res.redirect("/login");
             return null;
         });
 
@@ -150,5 +170,25 @@ public class App {
         for (var val : messages) {
             System.out.println(val + System.lineSeparator());
         }
+    }
+
+    private static Map<String, String> toMap(List<NameValuePair> pairs) {
+        Map<String, String> map = new HashMap<>();
+        for (NameValuePair pair : pairs) {
+            map.put(pair.getName(), pair.getValue());
+        }
+        return map;
+    }
+
+    private static Map<String, String> getPreparedFields(String request) {
+        Map<String, String> fields = new HashMap<>();
+        String[] values = request.split("&");
+
+        for (var value : values) {
+            String[] field = value.split("=");
+            fields.put(field[0], field[1]);
+        }
+
+        return fields;
     }
 }
